@@ -1,0 +1,16 @@
+library(ggplot2)
+library(tidyverse)
+
+growth <- read.csv("InSituGrowthData.csv")
+growth <- na.omit(growth)
+growth$Prev <- as.factor(growth$Prev)
+cdplot(Prev~mm2.sh.d,data=growth,xlab = "Growth (mm per shoot per day)",ylab="Prevelance")
+cdplot(Prev~Old.g,data=growth)
+plot(Old.g~mm2.sh.d,data=growth)
+plot(Old.g~sp.prod.mm2,data=growth)
+growth$Sheath <- as.numeric(growth$Sheath)
+plot(Sheath~mm2.sh.d,data=growth,xlab="Sheath length (mm)",ylab="Starting biomass (g)")
+
+leaf <- read.csv("LeafGrowth.csv")
+leaf$Prev <- as.factor(leaf$Prev)
+cdplot(Prev~mm2.l.d,data=leaf)
