@@ -1,0 +1,71 @@
+---
+title: "DiseaseGrowth"
+author: "LRA"
+date: "1/26/2020"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+library(lubridate)
+
+month_order <- c("June","July")
+
+```
+
+### Comparing disease severity to growth rates
+
+```{r data, echo=FALSE, warning=FALSE}
+combo <- read.csv("CombinedGrowthData.csv")
+combo$Type <- "Final"
+
+disease <- read.csv("In_Situ_Log_3.csv")
+disease$Shoot <- as.numeric(str_extract(disease$file_name, "[0-9]{1,2}"))
+
+combo <- full_join(combo,disease,by=c("Month"="month","Transect"="site","Type"="type","Shoot"))
+combo$leaf_area <- combo$healthy_area+combo$lesion_area
+combo$Prev <- as.factor(combo$Prev)
+combo$Month <- ordered(combo$Month,levels=month_order)
+combo$PrevMatch <- ifelse(combo$Prev==combo$prevelance,"TRUE","FALSE")
+combo$severity <- combo$severity/100
+
+```
+
+These are plots of WD severity as a function of plant growth metrics. 
+
+Severity is measured at the shoot level by EELISA.
+
+Plant growth are from pin-prick productivity measurements.
+
+All measurements come from one site (Fourth of July in San Juan Islands, WA).
+
+```{r severity_vs_growth, echo=FALSE, warning=FALSE}
+ggplot(combo,aes(x=g.sh.d,y=severity,color=Month))+geom_point()+
+  #stat_smooth(method="lm",show.legend = FALSE)+
+  xlab("Growth (g biomass per shoot per day)")+
+  ylab("WD severity")+
+  scale_y_continuous(limits=c(0,0.5))+
+  theme_bw()
+
+ggplot(combo,aes(x=mm2.sh.d,y=severity,color=Month))+geom_point()+
+  #stat_smooth(method="lm",show.legend = FALSE)+
+  xlab("Growth (mm2 leaf area per shoot per day)")+
+  ylab("WD severity")+
+  scale_y_continuous(limits=c(0,0.5))+
+  theme_bw()
+
+ggplot(combo,aes(x=sp.prod.g,y=severity,color=Month))+geom_point()+
+  #stat_smooth(method="lm",show.legend = FALSE)+
+  xlab("Specific productivity (% biomass per day)")+
+  ylab("WD severity")+
+  scale_y_continuous(limits=c(0,0.5))+
+  theme_bw()
+ggplot(combo,aes(x=sp.prod.mm2,y=severity,color=Month))+geom_point()+
+  #stat_smooth(method="lm",show.legend = FALSE)+
+  xlab("Specific productivity (% leaf area per day)")+
+  ylab("WD severity")+
+  scale_y_continuous(limits=c(0,0.5))+
+  theme_bw()
+```
